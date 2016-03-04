@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/fatih/color"
 	"io/ioutil"
 	"os"
 	"path"
@@ -111,7 +112,7 @@ func main() {
 
 	for _, counter := range counters {
 		if counter.Total > 0 {
-			fmt.Printf("%s source code:\n", counter.Lang)
+			color.Green("%s source code:\n", counter.Lang)
 			fmt.Printf("  Total %d files, %d lines. \n",
 				counter.Total, counter.Len)
 		}
