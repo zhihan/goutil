@@ -87,6 +87,10 @@ func isGroovySource(name string) bool {
 	return ext(name) == "groovy"
 }
 
+func isMatlabSource(name string) bool {
+	return ext(name) == "m"
+}
+
 func main() {
 	var cwd, _ = os.Getwd()
 
@@ -95,18 +99,22 @@ func main() {
 	var pythonCounter = sourceFile{isPythonSource, "python", 0, 0}
 	var javaCounter = sourceFile{isJavaSource, "java", 0, 0}
 	var groovyCounter = sourceFile{isGroovySource, "groovy", 0, 0}
+	var matlabCounter = sourceFile{isMatlabSource, "MATLAB", 0, 0}
 	
 	var counters = []*sourceFile{&goCounter,
 		&scalaCounter,
 		&pythonCounter,
 		&javaCounter,
-		&groovyCounter}
+		&groovyCounter,
+	    &matlabCounter}
 	visitDir(cwd, counters)
 
 	for _, counter := range counters {
-		fmt.Printf("%s source code:\n", counter.Lang)
-		fmt.Printf("  Total %d files, %d lines. \n",
-			counter.Total, counter.Len)
+		if counter.Total > 0 {
+			fmt.Printf("%s source code:\n", counter.Lang)
+			fmt.Printf("  Total %d files, %d lines. \n",
+				counter.Total, counter.Len)
+		}
 	}
 
 }
