@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
 func isHidden(name string) bool {
-	return name[1] == '.'
+	return name[0] == '.'
 }
 
 func ext(name string) string {
@@ -20,18 +21,43 @@ func ext(name string) string {
 	}
 }
 
+func isEmacsBackup(name string) bool {
+	return name[len(name)-1] == '~'
+}
+
+type sourceFile struct {
+	Is func(string) bool
+	Total bool
+}
+
+
+func visitDir(workDir string, sourceCounter sourceFile) {
+	var files, _ = ioutil.ReadDir(workDir)
+	
+	for _, file := range files {
+		// Skip hidden files
+		if isHidden(file.Name()) {
+			continue
+		}
+
+		if sourceCounter.Is(file.Name()) {
+			sourceCounter.Add(1)
+		}
+
+		if file.IsDir() {
+			visitDir(filepath.Join(workDir, file.Name()),
+			sourceCounter)
+		} else {
+			fmt.Printf("%s:%s\n", workDir, file.Name())
+		}
+	}
+}
+
 func main() {
 	var cwd, _ = os.Getwd()
 
-	
-	fmt.Println("Workding dir " + cwd)
-	var files, _ = ioutil.ReadDir(cwd)
-	for _, file := range files {
-		fmt.Println(file.Name())
-	}
-
-	fmt.Println(" ext1: " + ext(".ab"))
-	fmt.Printf(" Ishidden %t\n", isHidden(".ab"))
-	fmt.Println(" ext2: " + ext("ab"))
+	var goCounter = Go{0}
+	visitDir(cwd, &goCounter)
+	fmt.Printf("Source counter %v\n", goCounter)
 
 }
